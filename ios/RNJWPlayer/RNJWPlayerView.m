@@ -1,3 +1,4 @@
+#import "AppDelegate.h"
 #import "RNJWPlayerView.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
@@ -329,7 +330,7 @@
     
     if (url && url.scheme && url.host) {
         [itemBuilder file:url];
-    } else {
+    } else { // if url is nil, then newFile should also be nil, the following code would throw null pointer exception
         NSString* encodedString = [newFile stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
         NSURL* encodedUrl = [NSURL URLWithString:encodedString];
         [itemBuilder file:encodedUrl];
@@ -710,8 +711,10 @@
 
 -(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
 {
-    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
-    [window.rootViewController addChildViewController:_playerViewController];
+    
+    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    
+    [delegate.rootViewController addChildViewController:_playerViewController];
     _playerViewController.view.frame = self.superview.frame;
     [self addSubview:_playerViewController.view];
     [_playerViewController didMoveToParentViewController:window.rootViewController];
