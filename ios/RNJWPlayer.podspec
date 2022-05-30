@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   s.source_files  = "RNJWPlayer/*.{h,m}"
   s.dependency   'JWPlayerKit', '~> 4.5.3'
   s.dependency   'google-cast-sdk', '~> 4.7.0'
+  s.dependency   'YouboraJWPlayer4Adapter'
   s.dependency   'React'
   # s.static_framework = true
   s.info_plist = {
