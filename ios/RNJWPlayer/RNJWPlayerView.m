@@ -1,4 +1,3 @@
-#import "AppDelegate.h"
 #import "RNJWPlayerView.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
@@ -712,12 +711,27 @@
 -(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
 {
     
-    AppDelegate *delegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    /*
+     Original with error
+     
+     UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
+     [window.rootViewController addChildViewController:_playerViewController];
+     _playerViewController.view.frame = self.superview.frame;
+     [self addSubview:_playerViewController.view];
+     [_playerViewController didMoveToParentViewController:window.rootViewController];
+     
+     */
     
-    [delegate.rootViewController addChildViewController:_playerViewController];
+    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
+    [self.reactViewController addChildViewController:_playerViewController];
     _playerViewController.view.frame = self.superview.frame;
     [self addSubview:_playerViewController.view];
     [_playerViewController didMoveToParentViewController:window.rootViewController];
+    
+    /*
+     Works but is presented in a modal
+    [self.reactViewController presentViewController:_playerViewController animated:NO completion:nil];
+     */
     
     // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
