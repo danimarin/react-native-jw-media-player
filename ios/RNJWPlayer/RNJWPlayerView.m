@@ -329,7 +329,7 @@
     
     if (url && url.scheme && url.host) {
         [itemBuilder file:url];
-    } else { // if url is nil, then newFile should also be nil, the following code would throw null pointer exception
+    } else if (newFile != nil) {
         NSString* encodedString = [newFile stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
         NSURL* encodedUrl = [NSURL URLWithString:encodedString];
         [itemBuilder file:encodedUrl];
@@ -347,19 +347,16 @@
                 NSString* label = [source objectForKey:@"label"];
                 bool isDefault = [source objectForKey:@"default"];
                 
-                JWVideoSource* sourceItem = [JWVideoSource init];
                 JWVideoSourceBuilder* sourceBuilder = [[JWVideoSourceBuilder alloc] init];
                 
                 [sourceBuilder file:fileUrl];
                 [sourceBuilder label:label];
                 [sourceBuilder defaultVideo:isDefault];
                 
-                sourceItem = [sourceBuilder buildAndReturnError:&error];
-                
-                [sourcesArray addObject:sourceItem];
+                [sourcesArray addObject:[sourceBuilder buildAndReturnError:&error]];
             }
             
-            [itemBuilder videoSources:itemSourcesArray];
+            [itemBuilder videoSources:sourcesArray];
         }
     }
     
@@ -710,30 +707,19 @@
 
 -(void)presentPlayerViewController:(JWPlayerConfiguration*)configuration
 {
-    
-    /*
-     Original with error
-     
-     UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
-     [window.rootViewController addChildViewController:_playerViewController];
-     _playerViewController.view.frame = self.superview.frame;
-     [self addSubview:_playerViewController.view];
-     [_playerViewController didMoveToParentViewController:window.rootViewController];
-     
-     */
-    
-    UIWindow *window = (UIWindow*)[[UIApplication sharedApplication] keyWindow];
-    [self.reactViewController addChildViewController:_playerViewController];
-    _playerViewController.view.frame = self.superview.frame;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.reactViewController) {
+            [self.reactViewController addChildViewController:self->_playerViewController];
+            [self->_playerViewController didMoveToParentViewController:self.reactViewController];
+        } else {
+            [self reactAddControllerToClosestParent:self->_playerViewController];
+        }
+    });
+    _playerViewController.view.frame = self.frame;
     [self addSubview:_playerViewController.view];
-    [_playerViewController didMoveToParentViewController:window.rootViewController];
     
-    /*
-     Works but is presented in a modal
-    [self.reactViewController presentViewController:_playerViewController animated:NO completion:nil];
-     */
+    [_playerViewController setDelegates];
     
-    // before presentation of viewcontroller player is nil so acces only after
     if (configuration != nil) {
         [_playerViewController.player configurePlayerWith:configuration];
         
@@ -741,8 +727,6 @@
             _playerViewController.interfaceBehavior = JWInterfaceBehaviorHidden;
         }
     }
-    
-    [_playerViewController setDelegates];
 }
 
 #pragma mark - JWPlayer View helpers
@@ -961,6 +945,10 @@
 #pragma mark - DRM Delegate
 
 - (void)contentIdentifierForURL:(NSURL * _Nonnull)url completionHandler:(void (^ _Nonnull)(NSData * _Nullable))handler {
+    if (!_contentUUID) {
+        _contentUUID = [[url.absoluteString componentsSeparatedByString:@";"] lastObject];
+    }
+    
     NSData *uuidData = [_contentUUID dataUsingEncoding:NSUTF8StringEncoding];
     handler(uuidData);
 }
@@ -972,18 +960,20 @@
 }
 
 - (void)contentKeyWithSPCData:(NSData * _Nonnull)spcData completionHandler:(void (^ _Nonnull)(NSData * _Nullable, NSDate * _Nullable, NSString * _Nullable))handler {
-    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_processSpcUrl]];
+    NSTimeInterval currentTime = [[NSDate date] timeIntervalSince1970];
+    NSString *spcProcessURL = [NSString stringWithFormat:@"%@/%@?p1=%li", _processSpcUrl, _contentUUID, (NSInteger)currentTime];
+    NSMutableURLRequest *ckcRequest = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:spcProcessURL]];
     [ckcRequest setHTTPMethod:@"POST"];
     [ckcRequest setHTTPBody:spcData];
     [ckcRequest addValue:@"application/octet-stream" forHTTPHeaderField:@"Content-Type"];
-
+ 
     [[[NSURLSession sharedSession] dataTaskWithRequest:ckcRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        if (error != nil || (httpResponse != nil && httpResponse.statusCode != 200)) {
+        if (error != nil || (httpResponse != nil && !NSLocationInRange(httpResponse.statusCode , NSMakeRange(200, (299 - 200))))) {
             handler(nil, nil, nil);
             return;
         }
-
+ 
         handler(data, nil, nil);
     }] resume];
 }
