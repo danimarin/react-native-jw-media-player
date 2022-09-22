@@ -20,10 +20,23 @@
     self.player.contentKeyDataSource = self;
 }
 
+-(void)removeDelegates
+{
+    self.delegate = nil;
+    self.playerView.delegate = nil;
+    self.player.delegate = nil;
+    self.player.playbackStateDelegate = nil;
+    self.player.adDelegate = nil;
+    self.player.avDelegate = nil;
+    self.player.contentKeyDataSource = nil;
+}
+
 #pragma mark - JWPlayer Delegate
 
 - (void)jwplayerIsReady:(id<JWPlayer>)player
 {
+    [super jwplayerIsReady:player];
+    
     if (_parentView.onPlayerReady) {
         _parentView.onPlayerReady(@{});
     }
@@ -31,6 +44,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player failedWithError:(NSUInteger)code message:(NSString *)message
 {
+    [super jwplayer:player failedWithError:code message:message];
+    
     if (_parentView.onPlayerError) {
         _parentView.onPlayerError(@{@"error": message});
     }
@@ -38,6 +53,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player failedWithSetupError:(NSUInteger)code message:(NSString *)message
 {
+    [super jwplayer:player failedWithSetupError:code message:message];
+    
     if (_parentView.onSetupPlayerError) {
         _parentView.onSetupPlayerError(@{@"error": message});
     }
@@ -45,12 +62,16 @@
 
 - (void)jwplayer:(id<JWPlayer>)player encounteredWarning:(NSUInteger)code message:(NSString *)message
 {
+    [super jwplayer:player encounteredWarning:code message:message];
+    
     if (_parentView.onPlayerWarning) {
         _parentView.onPlayerWarning(@{@"warning": message});
     }
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdError:(NSUInteger)code message:(NSString * _Nonnull)message {
+    [super jwplayer:player encounteredAdError:code message:message];
+    
     if (_parentView.onPlayerAdError) {
         _parentView.onPlayerAdError(@{@"error": message});
     }
@@ -58,6 +79,8 @@
 
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player encounteredAdWarning:(NSUInteger)code message:(NSString * _Nonnull)message {
+    [super jwplayer:player encounteredAdWarning:code message:message];
+    
     if (_parentView.onPlayerAdWarning) {
         _parentView.onPlayerAdWarning(@{@"warning": message});
     }
@@ -68,6 +91,8 @@
 
 - (void)playerView:(JWPlayerView *)view sizeChangedFrom:(CGSize)oldSize to:(CGSize)newSize
 {
+    [super playerView:view sizeChangedFrom:oldSize to:newSize];
+    
     if (_parentView.onPlayerSizeChange) {
         NSMutableDictionary* oldSizeDict = [[NSMutableDictionary alloc] init];
         [oldSizeDict setObject:[NSNumber numberWithFloat: oldSize.width] forKey:@"width"];
@@ -262,6 +287,8 @@
 
 - (void)jwplayerContentIsBuffering:(id<JWPlayer>)player
 {
+    [super jwplayerContentIsBuffering:player];
+    
     if (_parentView.onBuffer) {
         _parentView.onBuffer(@{});
     }
@@ -269,6 +296,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isBufferingWithReason:(enum JWBufferReason)reason
 {
+    [super jwplayer:player isBufferingWithReason:reason];
+    
     if (_parentView.onBuffer) {
         _parentView.onBuffer(@{});
     }
@@ -276,6 +305,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player updatedBuffer:(double)percent position:(JWTimeData *)time
 {
+    [super jwplayer:player updatedBuffer:percent position:time];
+    
     if (_parentView.onUpdateBuffer) {
         _parentView.onUpdateBuffer(@{@"percent": @(percent), @"position": time});
     }
@@ -283,6 +314,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didFinishLoadingWithTime:(NSTimeInterval)loadTime
 {
+    [super jwplayer:player didFinishLoadingWithTime:loadTime];
+    
     if (_parentView.onLoaded) {
         _parentView.onLoaded(@{});
     }
@@ -290,6 +323,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isAttemptingToPlay:(JWPlayerItem *)playlistItem reason:(enum JWPlayReason)reason
 {
+    [super jwplayer:player isAttemptingToPlay:playlistItem reason:reason];
+    
     if (_parentView.onAttemptPlay) {
         _parentView.onAttemptPlay(@{});
     }
@@ -297,6 +332,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isPlayingWithReason:(enum JWPlayReason)reason
 {
+    [super jwplayer:player isPlayingWithReason:reason];
+    
     if (_parentView.onPlay) {
         _parentView.onPlay(@{});
     }
@@ -307,6 +344,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player willPlayWithReason:(enum JWPlayReason)reason
 {
+    [super jwplayer:player willPlayWithReason:reason];
+    
     if (_parentView.onBeforePlay) {
         _parentView.onBeforePlay(@{});
     }
@@ -314,6 +353,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didPauseWithReason:(enum JWPauseReason)reason
 {
+    [super jwplayer:player didPauseWithReason:reason];
+    
     if (_parentView.onPause) {
         _parentView.onPause(@{});
     }
@@ -325,6 +366,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didBecomeIdleWithReason:(enum JWIdleReason)reason
 {
+    [super jwplayer:player didBecomeIdleWithReason:reason];
+    
     if (_parentView.onIdle) {
         _parentView.onIdle(@{});
     }
@@ -332,6 +375,8 @@
 
 - (void)jwplayer:(id<JWPlayer>)player isVisible:(BOOL)isVisible
 {
+    [super jwplayer:player isVisible:isVisible];
+    
     if (_parentView.onVisible) {
         _parentView.onVisible(@{@"visible": @(isVisible)});
     }
@@ -339,6 +384,8 @@
 
 - (void)jwplayerContentWillComplete:(id<JWPlayer>)player
 {
+    [super jwplayerContentWillComplete:player];
+    
     if (_parentView.onBeforeComplete) {
         _parentView.onBeforeComplete(@{});
     }
@@ -346,6 +393,8 @@
 
 - (void)jwplayerContentDidComplete:(id<JWPlayer>)player
 {
+    [super jwplayerContentDidComplete:player];
+    
     if (_parentView.onComplete) {
         _parentView.onComplete(@{});
     }
@@ -353,12 +402,20 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylistItem:(JWPlayerItem *)item at:(NSUInteger)index
 {
+    [super jwplayer:player didLoadPlaylistItem:item at:index];
+    
     if (_parentView.onPlaylistItem) {
+        NSString *file;
+        
         NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
         for (JWVideoSource* source in item.videoSources) {
             [sourceDict setObject:source.file forKey:@"file"];
             [sourceDict setObject:source.label forKey:@"label"];
             [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+            
+            if (source.defaultVideo) {
+                file = [source.file absoluteString];
+            }
         }
         
         NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
@@ -376,6 +433,7 @@
         }
         
         NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  file, @"file",
                                   item.mediaId, @"mediaId",
                                   item.title, @"title",
                                   item.description, @"description",
@@ -399,15 +457,23 @@
 
 - (void)jwplayer:(id<JWPlayer>)player didLoadPlaylist:(NSArray<JWPlayerItem *> *)playlist
 {
+    [super jwplayer:player didLoadPlaylist:playlist];
+    
     if (_parentView.onPlaylist) {
         NSMutableArray* playlistArray = [[NSMutableArray alloc] init];
         
         for (JWPlayerItem* item in playlist) {
+            NSString *file;
+            
             NSMutableDictionary* sourceDict = [[NSMutableDictionary alloc] init];
             for (JWVideoSource* source in item.videoSources) {
                 [sourceDict setObject:source.file forKey:@"file"];
                 [sourceDict setObject:source.label forKey:@"label"];
                 [sourceDict setObject:@(source.defaultVideo) forKey:@"default"];
+                
+                if (source.defaultVideo) {
+                    file = [source.file absoluteString];
+                }
             }
             
             NSMutableDictionary* schedDict = [[NSMutableDictionary alloc] init];
@@ -425,6 +491,7 @@
             }
             
             NSDictionary* itemDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      file, @"file",
                                       item.mediaId, @"mediaId",
                                       item.title, @"title",
                                       item.description, @"description",
@@ -449,6 +516,8 @@
 
 - (void)jwplayerPlaylistHasCompleted:(id<JWPlayer>)player
 {
+    [super jwplayerPlaylistHasCompleted:player];
+    
     if (_parentView.onPlaylistComplete) {
         _parentView.onPlaylistComplete(@{});
     }
@@ -456,11 +525,13 @@
 
 - (void)jwplayer:(id<JWPlayer>)player usesMediaType:(enum JWMediaType)type
 {
-
+    [super jwplayer:player usesMediaType:type];
 }
 
 - (void)jwplayer:(id<JWPlayer>)player seekedFrom:(NSTimeInterval)oldPosition to:(NSTimeInterval)newPosition
 {
+    [super jwplayer:player seekedFrom:oldPosition to:newPosition];
+    
     if (_parentView.onSeek) {
         _parentView.onSeek(@{@"from": @(oldPosition), @"to": @(newPosition)});
     }
@@ -468,6 +539,8 @@
 
 - (void)jwplayerHasSeeked:(id<JWPlayer>)player
 {
+    [super jwplayerHasSeeked:player];
+    
     if (_parentView.onSeeked) {
         _parentView.onSeeked(@{});
     }
@@ -475,17 +548,19 @@
 
 - (void)jwplayer:(id<JWPlayer>)player playbackRateChangedTo:(double)rate at:(NSTimeInterval)time
 {
-    
+    [super jwplayer:player playbackRateChangedTo:rate at:time];
 }
 
 - (void)jwplayer:(id<JWPlayer>)player updatedCues:(NSArray<JWCue *> * _Nonnull)cues
 {
-    
+    [super jwplayer:player updatedCues:cues];
 }
 
 #pragma mark - JWPlayer Ad Delegate
 
 - (void)jwplayer:(id _Nonnull)player adEvent:(JWAdEvent * _Nonnull)event {
+    [super jwplayer:player adEvent:event];
+    
     if (_parentView.onAdEvent) {
         _parentView.onAdEvent(@{@"client": @(event.client), @"type": @(event.type)});
     }
@@ -494,24 +569,32 @@
 #pragma mark - JWPlayer Cast Delegate
 
 - (void)castController:(JWCastController * _Nonnull)controller castingBeganWithDevice:(JWCastingDevice * _Nonnull)device {
+    [super castController:controller castingBeganWithDevice:device];
+    
     if (_parentView.onCasting) {
         _parentView.onCasting(@{});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller castingEndedWithError:(NSError * _Nullable)error {
+    [super castController:controller castingEndedWithError:error];
+    
     if (_parentView.onCastingEnded) {
         _parentView.onCastingEnded(@{@"error": error});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller castingFailedWithError:(NSError * _Nonnull)error {
+    [super castController:controller castingFailedWithError:error];
+    
     if (_parentView.onCastingFailed) {
         _parentView.onCastingFailed(@{@"error": error});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectedTo:(JWCastingDevice * _Nonnull)device {
+    [super castController:controller connectedTo:device];
+    
     if (_parentView.onConnectedToCastingDevice) {
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
             
@@ -526,24 +609,32 @@
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionFailedWithError:(NSError * _Nonnull)error {
+    [super castController:controller connectionFailedWithError:error];
+    
     if (_parentView.onConnectionFailed) {
         _parentView.onConnectionFailed(@{@"error": error});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionRecoveredWithDevice:(JWCastingDevice * _Nonnull)device {
+    [super castController:controller connectionRecoveredWithDevice:device];
+    
     if (_parentView.onConnectionRecovered) {
         _parentView.onConnectionRecovered(@{});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller connectionSuspendedWithDevice:(JWCastingDevice * _Nonnull)device {
+    [super castController:controller connectionSuspendedWithDevice:device];
+    
     if (_parentView.onConnectionTemporarilySuspended) {
         _parentView.onConnectionTemporarilySuspended(@{});
     }
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller devicesAvailable:(NSArray<JWCastingDevice *> * _Nonnull)devices {
+    [super castController:controller devicesAvailable:devices];
+    
     _parentView.availableDevices = devices;
     
     if (_parentView.onCastingDevicesAvailable) {
@@ -566,6 +657,8 @@
 }
 
 - (void)castController:(JWCastController * _Nonnull)controller disconnectedWithError:(NSError * _Nullable)error {
+    [super castController:controller disconnectedWithError:error];
+    
     if (_parentView.onDisconnectedFromCastingDevice) {
         _parentView.onDisconnectedFromCastingDevice(@{@"error": error});
     }
@@ -574,33 +667,35 @@
 #pragma mark - JWPlayer AV Delegate
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTracksUpdated:(NSArray<JWMediaSelectionOption *> * _Nonnull)levels {
+    [super jwplayer:player audioTracksUpdated:levels];
+    
     if (_parentView.onAudioTracks) {
         _parentView.onAudioTracks(@{});
     }
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player audioTrackChanged:(NSInteger)currentLevel {
-    
+    [super jwplayer:player audioTrackChanged:currentLevel];
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player captionPresented:(NSArray<NSString *> * _Nonnull)caption at:(JWTimeData * _Nonnull)time {
-    
+    [super jwplayer:player captionPresented:caption at:time];
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player captionTrackChanged:(NSInteger)index {
-    
+    [super jwplayer:player captionTrackChanged:index];
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player qualityLevelChanged:(NSInteger)currentLevel {
-    
+    [super jwplayer:player qualityLevelChanged:currentLevel];
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player qualityLevelsUpdated:(NSArray<JWVideoSource *> * _Nonnull)levels {
-    
+    [super jwplayer:player qualityLevelsUpdated:levels];
 }
 
 - (void)jwplayer:(id<JWPlayer> _Nonnull)player updatedCaptionList:(NSArray<JWMediaSelectionOption *> * _Nonnull)options {
-    
+    [super jwplayer:player updatedCaptionList:options];
 }
 
 @end

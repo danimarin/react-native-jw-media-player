@@ -1,11 +1,11 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath 'com.android.tools.build:gradle:3.4.2'
     }
 }
 
@@ -35,14 +35,15 @@ android {
 
 allprojects {
     repositories {
-        maven{
-            url 'https://mvn.jwplayer.com/content/repositories/releases/'
-        }
         mavenLocal()
-        jcenter()
+        mavenCentral()
+        google()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url "$rootDir/../node_modules/react-native/android"
+        }
+        maven{
+            url 'https://mvn.jwplayer.com/content/repositories/releases/'
         }
     }
 }
@@ -52,10 +53,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.9'
 
     // JWPlayer SDK
-    implementation 'com.jwplayer:jwplayer-core:4.5.1'
-    implementation 'com.jwplayer:jwplayer-common:4.5.1'
-    implementation 'com.jwplayer:jwplayer-chromecast:4.5.1'
-    implementation 'com.jwplayer:jwplayer-ima:4.5.1'
+    implementation 'com.jwplayer:jwplayer-core:4.6.0'
+    implementation 'com.jwplayer:jwplayer-common:4.6.0'
+    implementation 'com.jwplayer:jwplayer-chromecast:4.6.0'
+    implementation 'com.jwplayer:jwplayer-ima:4.6.0'
 
     // Ad dependencies
     implementation 'com.google.ads.interactivemedia.v3:interactivemedia:3.27.0'
